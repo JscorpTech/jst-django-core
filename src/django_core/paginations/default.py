@@ -36,7 +36,7 @@ class CustomPagination(PageNumberPagination):
                 "results",
             ],
             "properties": {
-                "status": {"type": "bool", "example": True},
+                "status": {"type": "boolean", "example": True},
                 "data": {
                     "type": "object",
                     "properties": {
