@@ -6,13 +6,7 @@ class BaseViewSetMixin:
         if response.status_code >= 400:
             response.data = {
                 "status": False,
-                "data": {
-                    "detail": (
-                        response.data.get("detail", _("Xatolik yuz berdi"))
-                        if isinstance(response.data, dict)
-                        else _("Xatolik yuz berdi")
-                    )
-                },
+                "data": response.data
             }
         else:
             response.data = {
