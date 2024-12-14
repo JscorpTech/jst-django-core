@@ -36,44 +36,50 @@ class CustomPagination(PageNumberPagination):
                 "results",
             ],
             "properties": {
-                "links": {
+                "status": {"type": "bool", "example": True},
+                "data": {
                     "type": "object",
-                    "required": ["previous", "next"],
                     "properties": {
-                        "previous": {
-                            "type": "string",
-                            "nullable": True,
-                            "format": "uri",
-                            "example": "http://api.example.org/accounts/?{page_query_param}=2".format(
-                                page_query_param=self.page_query_param
-                            ),
+                        "links": {
+                            "type": "object",
+                            "required": ["previous", "next"],
+                            "properties": {
+                                "previous": {
+                                    "type": "string",
+                                    "nullable": True,
+                                    "format": "uri",
+                                    "example": "http://api.example.org/accounts/?{page_query_param}=2".format(
+                                        page_query_param=self.page_query_param
+                                    ),
+                                },
+                                "next": {
+                                    "type": "string",
+                                    "nullable": True,
+                                    "format": "uri",
+                                    "example": "http://api.example.org/accounts/?{page_query_param}=4".format(
+                                        page_query_param=self.page_query_param
+                                    ),
+                                },
+                            },
                         },
-                        "next": {
-                            "type": "string",
-                            "nullable": True,
-                            "format": "uri",
-                            "example": "http://api.example.org/accounts/?{page_query_param}=4".format(
-                                page_query_param=self.page_query_param
-                            ),
+                        "total_items": {
+                            "type": "integer",
+                            "example": 10,
                         },
+                        "total_pages": {
+                            "type": "integer",
+                            "example": 1,
+                        },
+                        "page_size": {
+                            "type": "integer",
+                            "example": 10,
+                        },
+                        "current_page": {
+                            "type": "integer",
+                            "example": 1,
+                        },
+                        "results": schema,
                     },
                 },
-                "total_items": {
-                    "type": "integer",
-                    "example": 10,
-                },
-                "total_pages": {
-                    "type": "integer",
-                    "example": 1,
-                },
-                "page_size": {
-                    "type": "integer",
-                    "example": 10,
-                },
-                "current_page": {
-                    "type": "integer",
-                    "example": 1,
-                },
-                "results": schema,
             },
         }
