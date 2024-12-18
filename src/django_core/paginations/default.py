@@ -1,5 +1,3 @@
-from typing import Any
-
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
@@ -7,7 +5,7 @@ from rest_framework.response import Response
 class CustomPagination(PageNumberPagination):
     page_size = 10  # Default page size
     page_size_query_param = "page_size"  # Allow client to set page size
-    max_page_size = 100  # Maximum page size allowed
+    max_page_size = 200  # Maximum page size allowed
 
     def get_paginated_response(self, data):
         return Response(
@@ -24,9 +22,44 @@ class CustomPagination(PageNumberPagination):
             }
         )
 
-    def get_paginated_response_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
+    def get_paginated_response_schema(self, schema):
         return {
             "type": "object",
+            "properties": {
+                "links": {
+                    "type": "object",
+                    "properties": {
+                        "previous": {
+                            "type": ["string", "null"],
+                            "format": "uri",
+                            "example": "http://api.example.org/accounts/?page=2",
+                        },
+                        "next": {
+                            "type": ["string", "null"],
+                            "format": "uri",
+                            "example": "http://api.example.org/accounts/?page=4",
+                        },
+                    },
+                    "required": ["previous", "next"],
+                },
+                "total_items": {
+                    "type": "integer",
+                    "example": 100,
+                },
+                "total_pages": {
+                    "type": "integer",
+                    "example": 10,
+                },
+                "page_size": {
+                    "type": "integer",
+                    "example": 10,
+                },
+                "current_page": {
+                    "type": "integer",
+                    "example": 1,
+                },
+                "results": schema,  # Shema natijalar uchun ishlatiladi
+            },
             "required": [
                 "links",
                 "total_items",
@@ -35,51 +68,4 @@ class CustomPagination(PageNumberPagination):
                 "current_page",
                 "results",
             ],
-            "properties": {
-                "status": {"type": "boolean", "example": True},
-                "data": {
-                    "type": "object",
-                    "properties": {
-                        "links": {
-                            "type": "object",
-                            "required": ["previous", "next"],
-                            "properties": {
-                                "previous": {
-                                    "type": "string",
-                                    "nullable": True,
-                                    "format": "uri",
-                                    "example": "http://api.example.org/accounts/?{page_query_param}=2".format(
-                                        page_query_param=self.page_query_param
-                                    ),
-                                },
-                                "next": {
-                                    "type": "string",
-                                    "nullable": True,
-                                    "format": "uri",
-                                    "example": "http://api.example.org/accounts/?{page_query_param}=4".format(
-                                        page_query_param=self.page_query_param
-                                    ),
-                                },
-                            },
-                        },
-                        "total_items": {
-                            "type": "integer",
-                            "example": 10,
-                        },
-                        "total_pages": {
-                            "type": "integer",
-                            "example": 1,
-                        },
-                        "page_size": {
-                            "type": "integer",
-                            "example": 10,
-                        },
-                        "current_page": {
-                            "type": "integer",
-                            "example": 1,
-                        },
-                        "results": schema,
-                    },
-                },
-            },
         }
