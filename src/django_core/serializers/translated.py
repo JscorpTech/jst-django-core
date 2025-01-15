@@ -28,7 +28,7 @@ class AbstractTranslatedSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
 
         translated_fields = getattr(self.Meta, "translated_fields", [])
-        translation_mode = getattr(self.Meta, "translated", 1)  # Default to 1
+        translation_mode = getattr(self.Meta, "translated", 0)  # Default to 0
 
         for field in translated_fields:
             if translation_mode == 1:
