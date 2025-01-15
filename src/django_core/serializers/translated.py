@@ -3,28 +3,57 @@ from rest_framework import serializers
 
 
 class AbstractTranslatedSerializer(serializers.ModelSerializer):
+    """
+    Serializer for models with translated fields. Automatically handles translation
+    fields based on settings.LANGUAGES.
+    """
+
+    def _translate_json(self, instance, field):
+        """
+        Generates a dictionary with translations for a given field.
+
+        :param instance: The model instance.
+        :param field: The base field name.
+        :return: A dictionary of translations, e.g., {'en': value, 'uz': value}.
+        """
+        return {lang: getattr(instance, f"{field}_{lang}", None) for lang, _ in settings.LANGUAGES}
+
     def to_representation(self, instance):
         """
-        Override to_representation to add translated fields to the response.
+        Customizes the serialized representation of the instance.
+
+        :param instance: The model instance.
+        :return: A dictionary representation of the instance.
         """
         representation = super().to_representation(instance)
-        for field in self.Meta.translated_fields:
-            for lang, _ in settings.LANGUAGES:
-                translated_field = f"{field}_{lang}"
-                representation[translated_field] = getattr(instance, translated_field)
+
+        translated_fields = getattr(self.Meta, "translated_fields", [])
+        translation_mode = getattr(self.Meta, "translated", 1)  # Default to 1
+
+        for field in translated_fields:
+            if translation_mode == 1:
+                representation[field] = self._translate_json(instance, field)
+            elif translation_mode == 2:
+                for lang, _ in settings.LANGUAGES:
+                    field_name = f"{field}_{lang}"
+                    representation[field_name] = getattr(instance, field_name, None)
+
         return representation
 
     def to_internal_value(self, data):
         """
-        Override to_internal_value to process translated fields from the input data.
-        For each field in Meta.translated_fields, generate a translated field name
-        by appending the language code, and add this translated field to the internal
-        value if it exists in the input data.
+        Converts incoming data to a validated dictionary suitable for the model.
+
+        :param data: The input data.
+        :return: A validated dictionary of field values.
         """
         internal_value = super().to_internal_value(data)
-        for field in self.Meta.translated_fields:
+
+        translated_fields = getattr(self.Meta, "translated_fields", [])
+        for field in translated_fields:
             for lang, _ in settings.LANGUAGES:
                 translated_field = f"{field}_{lang}"
                 if translated_field in data:
                     internal_value[translated_field] = data[translated_field]
+
         return internal_value
