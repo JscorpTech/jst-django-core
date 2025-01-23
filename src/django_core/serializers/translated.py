@@ -47,9 +47,15 @@ class AbstractTranslatedSerializer(serializers.ModelSerializer):
         :param data: The input data.
         :return: A validated dictionary of field values.
         """
-        internal_value = super().to_internal_value(data)
-
+        data = data.copy()
+        if not isinstance(data, dict):
+            return data
         translated_fields = getattr(self.Meta, "translated_fields", [])
+        for field in translated_fields:
+            value = data.get(f"{field}_{settings.LANGUAGE_CODE}", data.get(field, None))
+            if value is not None:
+                data[field] = value
+        internal_value = super().to_internal_value(data)
         for field in translated_fields:
             for lang, _ in settings.LANGUAGES:
                 translated_field = f"{field}_{lang}"
