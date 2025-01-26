@@ -1,12 +1,9 @@
 from typing import Any
 
 
-class BaseViewSetMixin:
+class BaseViewSetMixin(object):
     action_serializer_class = {}
     action_permission_classes = {}
-    action = None
-    serializer_class = None
-    permission_classes = None
 
     def finalize_response(self, request, response, *args, **kwargs):
         if response.status_code >= 400:
@@ -23,4 +20,9 @@ class BaseViewSetMixin:
         return self.action_serializer_class.get(self.action, self.serializer_class)
 
     def get_permissions(self) -> Any:
-        return self.action_permission_classes.get(self.action, self.permission_classes)
+        return [
+            permission()
+            for permission in self.action_permission_classes.get(
+                self.action, self.permission_classes
+            )
+        ]
