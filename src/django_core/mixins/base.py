@@ -1,4 +1,13 @@
+from typing import Any
+
+
 class BaseViewSetMixin:
+    action_serializer_class = {}
+    action_permission_classes = {}
+    action = None
+    serializer_class = None
+    permission_classes = None
+
     def finalize_response(self, request, response, *args, **kwargs):
         if response.status_code >= 400:
             response.data = {"status": False, "data": response.data}
@@ -9,3 +18,9 @@ class BaseViewSetMixin:
             }
 
         return super().finalize_response(request, response, *args, **kwargs)
+
+    def get_serializer_class(self) -> Any:
+        return self.action_serializer_class.get(self.action, self.serializer_class)
+
+    def get_permissions(self) -> Any:
+        return self.action_permission_classes.get(self.action, self.permission_classes)
