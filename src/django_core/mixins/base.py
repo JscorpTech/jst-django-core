@@ -8,6 +8,8 @@ class BaseViewSetMixin(object):
     def finalize_response(self, request, response, *args, **kwargs):
         if response.status_code >= 400:
             response.data = {"status": False, "data": response.data}
+        elif response.status_code == 204:
+            pass
         else:
             response.data = {
                 "status": True,
