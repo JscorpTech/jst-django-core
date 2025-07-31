@@ -7,26 +7,33 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='SmsConfirm',
+            name="SmsConfirm",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('code', models.IntegerField()),
-                ('try_count', models.IntegerField(default=0)),
-                ('resend_count', models.IntegerField(default=0)),
-                ('phone', models.CharField(max_length=20)),
-                ('expire_time', models.DateTimeField(blank=True, null=True)),
-                ('unlock_time', models.DateTimeField(blank=True, null=True)),
-                ('resend_unlock_time', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("code", models.CharField(max_length=255)),
+                ("try_count", models.IntegerField(default=0)),
+                ("resend_count", models.IntegerField(default=0)),
+                ("phone", models.CharField(max_length=20)),
+                ("expire_time", models.DateTimeField(blank=True, null=True)),
+                ("unlock_time", models.DateTimeField(blank=True, null=True)),
+                ("resend_unlock_time", models.DateTimeField(blank=True, null=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

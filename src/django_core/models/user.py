@@ -1,5 +1,6 @@
 import math
 from datetime import datetime, timedelta
+
 from django.db import models
 
 from .base import AbstractBaseModel
@@ -12,7 +13,7 @@ class SmsConfirm(AbstractBaseModel):
     RESEND_COUNT = 5
     TRY_COUNT = 10
 
-    code = models.IntegerField()
+    code = models.CharField(max_length=255)
     try_count = models.IntegerField(default=0)
     resend_count = models.IntegerField(default=0)
     phone = models.CharField(max_length=20)
@@ -24,15 +25,25 @@ class SmsConfirm(AbstractBaseModel):
         if self.resend_count >= self.RESEND_COUNT:
             self.try_count = 0
             self.resend_count = 0
-            self.resend_unlock_time = datetime.now() + timedelta(minutes=self.RESEND_BLOCK_MINUTES)
+            self.resend_unlock_time = datetime.now() + timedelta(
+                minutes=self.RESEND_BLOCK_MINUTES
+            )
         elif self.try_count >= self.TRY_COUNT:
             self.try_count = 0
-            self.unlock_time = datetime.now() + timedelta(minutes=self.TRY_BLOCK_MINUTES)
+            self.unlock_time = datetime.now() + timedelta(
+                minutes=self.TRY_BLOCK_MINUTES
+            )
 
-        if self.resend_unlock_time is not None and self.resend_unlock_time.timestamp() < datetime.now().timestamp():
+        if (
+            self.resend_unlock_time is not None
+            and self.resend_unlock_time.timestamp() < datetime.now().timestamp()
+        ):
             self.resend_unlock_time = None
 
-        if self.unlock_time is not None and self.unlock_time.timestamp() < datetime.now().timestamp():
+        if (
+            self.unlock_time is not None
+            and self.unlock_time.timestamp() < datetime.now().timestamp()
+        ):
             self.unlock_time = None
         self.save()
 
